@@ -35,9 +35,10 @@ legend {
   margin: -45px auto 0;
 }
 
-#add.disabled {
+#add:disabled {
   background-color: #666;
   opacity: inherit;
+  cursor: not-allowed;
 }
 
 button {

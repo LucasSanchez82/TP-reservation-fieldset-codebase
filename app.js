@@ -9,18 +9,18 @@ const addFieldSet = (date, nbPlaces) => {
   fieldset.id = `fieldset-${id}`;
   fieldset.innerHTML = `
   <legend>Réservation</legend>
-
-    <div class="form-group row">
-        <div class="col-sm-4">
-            <label> Date : ${date}</label>
+  
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label> Date : ${date}</label>
         </div>
     </div>
 
     <div class="form-group row">
-        <div class="col-sm-4">
+      <div class="col-sm-4">
         <label> Nombres de places : ${nbPlaces}</label>
-    </div>
-`;
+      </div>
+      `;
   fieldsetValues.push({
     date,
     nbPlaces,
@@ -29,6 +29,9 @@ const addFieldSet = (date, nbPlaces) => {
   });
   form.insertBefore(fieldset, form[0]);
 };
+JSON.parse(localStorage.getItem("reservations")).forEach(({ date, nbPlaces }) =>
+  addFieldSet(date, nbPlaces)
+);
 
 const datesToDisplay = [
   { value: "2024-01-06" },
@@ -37,22 +40,35 @@ const datesToDisplay = [
   { value: "2024-01-27" },
 ];
 
+const isDateAvailableAndUpButtonDisabledSate = (date) => {
+  const isAvailable = datesToDisplay.map((curr) => curr.value).includes(date);
+  addButton.disabled = !isAvailable;
+  return isAvailable;
+};
+
 datesToDisplay.forEach((date) => {
   const option = document.createElement("option");
   [option.value, option.text] = [date.value, date.value];
   select.appendChild(option);
 });
 
+select.addEventListener("change", (e) =>
+  isDateAvailableAndUpButtonDisabledSate(e.target.value)
+);
+
 addButton.addEventListener("click", (e) => {
   e.preventDefault();
   const formdata = new FormData(form);
   const { date, nbPlaces } = Object.fromEntries(formdata);
-  if (!(date && nbPlaces)) {
+  if (!(date && nbPlaces) || !isDateAvailableAndUpButtonDisabledSate(date)) {
     alert("Veuillez remplir tous les champs");
     throw new Error("Veuillez remplir tous les champs");
   }
   addFieldSet(date, nbPlaces);
 });
 
-// fieldset element
-// document.
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  localStorage.setItem("reservations", JSON.stringify(fieldsetValues));
+  alert("Enregistré avec succès (vous pouvez verfier en rechargeant la page)");
+});
