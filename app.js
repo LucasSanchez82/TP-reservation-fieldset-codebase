@@ -20,7 +20,13 @@ const addFieldSet = (date, nbPlaces) => {
       <div class="col-sm-4">
         <label> Nombres de places : ${nbPlaces}</label>
       </div>
+      <button type="button">Supprimer</button>
       `;
+  fieldset.querySelector("button").addEventListener("click", () => {
+    fieldsetValues.splice(id, 1);
+    console.log(fieldsetValues);
+    fieldset.style.display = "none";
+  });
   fieldsetValues.push({
     date,
     nbPlaces,
@@ -29,9 +35,9 @@ const addFieldSet = (date, nbPlaces) => {
   });
   form.insertBefore(fieldset, form[0]);
 };
-JSON.parse(localStorage.getItem("reservations")).forEach(({ date, nbPlaces }) =>
-  addFieldSet(date, nbPlaces)
-);
+const persistentDatas = JSON.parse(localStorage.getItem("reservations"));
+if (persistentDatas)
+  persistentDatas.forEach(({ date, nbPlaces }) => addFieldSet(date, nbPlaces));
 
 const datesToDisplay = [
   { value: "2024-01-06" },
