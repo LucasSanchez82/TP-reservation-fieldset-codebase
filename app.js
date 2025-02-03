@@ -2,6 +2,24 @@ const select = document.querySelector("#select");
 const addButton = document.getElementById("add");
 const form = document.querySelector("form");
 const fieldsetValues = [];
+const datesToDisplay = [
+  { value: "2024-01-06" },
+  { value: "2024-01-13" },
+  { value: "2024-01-20" },
+  { value: "2024-01-27" },
+];
+
+const upDateSelect = () => {
+  while (select.firstChild) select.removeChild(select.firstChild); // remove all child nodes
+  datesToDisplay
+    .filter(({ value }) => !fieldsetValues.find((v) => v.date === value))
+    .forEach((date) => {
+      const option = document.createElement("option");
+      [option.value, option.text] = [date.value, date.value];
+      select.appendChild(option);
+    });
+};
+
 const addFieldSet = (date, nbPlaces) => {
   const id = fieldsetValues.length;
   const fieldset = document.createElement("fieldset");
@@ -24,8 +42,8 @@ const addFieldSet = (date, nbPlaces) => {
       `;
   fieldset.querySelector("button").addEventListener("click", () => {
     fieldsetValues.splice(id, 1);
-    console.log(fieldsetValues);
     fieldset.style.display = "none";
+    upDateSelect();
   });
   fieldsetValues.push({
     date,
@@ -34,29 +52,16 @@ const addFieldSet = (date, nbPlaces) => {
     ref: fieldset,
   });
   form.insertBefore(fieldset, form[0]);
+  upDateSelect();
 };
 const persistentDatas = JSON.parse(localStorage.getItem("reservations"));
 if (persistentDatas)
   persistentDatas.forEach(({ date, nbPlaces }) => addFieldSet(date, nbPlaces));
-
-const datesToDisplay = [
-  { value: "2024-01-06" },
-  { value: "2024-01-13" },
-  { value: "2024-01-20" },
-  { value: "2024-01-27" },
-];
-
 const isDateAvailableAndUpButtonDisabledSate = (date) => {
   const isAvailable = datesToDisplay.map((curr) => curr.value).includes(date);
   addButton.disabled = !isAvailable;
   return isAvailable;
 };
-
-datesToDisplay.forEach((date) => {
-  const option = document.createElement("option");
-  [option.value, option.text] = [date.value, date.value];
-  select.appendChild(option);
-});
 
 select.addEventListener("change", (e) =>
   isDateAvailableAndUpButtonDisabledSate(e.target.value)
@@ -78,3 +83,5 @@ form.addEventListener("submit", (e) => {
   localStorage.setItem("reservations", JSON.stringify(fieldsetValues));
   alert("Enregistré avec succès (vous pouvez verfier en rechargeant la page)");
 });
+
+upDateSelect();
